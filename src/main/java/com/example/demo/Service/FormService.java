@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +84,19 @@ public class FormService {
 
     public List<Form> getPublishedForms() {
         return formRepository.findByPublished(true);
+    }
+
+    public Boolean validateFieldIds(List<Field> fields) {
+        List<Field> allFields = formRepository.findAll().stream()
+                .flatMap(form -> form.getFields().stream())
+                .toList();
+        for (Field field: fields) {
+            for (Field existingField : allFields){
+                if(field.getFieldId() == existingField.getFieldId()){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
