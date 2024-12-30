@@ -34,7 +34,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Form with this id already exists!");
         }
         if (!formService.validateFieldIds(form.getFields())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The given field ids already exist.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There are multiple fields with same id in this form.");
         }
         Form createdForm = formService.addForm(form);
         if (createdForm != null) {
@@ -66,6 +66,9 @@ public class FormController {
         if (!id.equals(form.getId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can not change the form's id!");
         }
+        if (!formService.validateFieldIds(form.getFields())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There are multiple fields with same id in this form.");
+        }
         Form createdForm = formService.updateForm(id, form);
         if (createdForm != null) {
             return ResponseEntity.status(HttpStatus.OK).body("The form updated successfully.");
@@ -96,6 +99,9 @@ public class FormController {
     public ResponseEntity<String> updateFormFields(@PathVariable Long id, @RequestBody List<Field> fields) {
         if (formService.getFormById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Form with given id does not exist!");
+        }
+        if (!formService.validateFieldIds(fields)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There are multiple fields with same id in this form.");
         }
         if (formService.updateFormFields(id, fields) != null) {
             return ResponseEntity.status(HttpStatus.OK).body("Form's fields updated successfully");

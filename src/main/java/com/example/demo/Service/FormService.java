@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,14 +89,10 @@ public class FormService {
     }
 
     public Boolean validateFieldIds(List<Field> fields) {
-        List<Field> allFields = formRepository.findAll().stream()
-                .flatMap(form -> form.getFields().stream())
-                .toList();
-        for (Field field: fields) {
-            for (Field existingField : allFields){
-                if(field.getFieldId() == existingField.getFieldId()){
-                    return false;
-                }
+        Set<Long> uniqueIds = new HashSet<>();
+        for (Field field : fields) {
+            if (!uniqueIds.add(field.getFieldId())) {
+                return false;
             }
         }
         return true;
